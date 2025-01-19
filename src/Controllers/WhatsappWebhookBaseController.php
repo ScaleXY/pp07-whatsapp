@@ -62,7 +62,7 @@ class WhatsappWebhookBaseController
             foreach ($item['changes'] as $change) {
                 foreach ($change['value']['contacts'] as $contact) {
                     foreach ($change['value']['messages'] as $message) {
-                        TextMessageReceived::dispatch($contact['wa_id'].' said '.$message['text']['body']);
+                        TextMessageReceived::dispatch($contact['wa_id'], $message['text']['body'], $change);
                     }
                 }
             }

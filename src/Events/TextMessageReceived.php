@@ -15,13 +15,16 @@ class TextMessageReceived
 
     public $message;
 
+    public $full_change;
+
     /**
      * Create a new event instance.
      */
-    public function __construct($sender, $message)
+    public function __construct($sender, $message, $full_change)
     {
         $this->sender = $sender;
         $this->message = $message;
+        $this->full_change = $full_change;
     }
 
     /**
