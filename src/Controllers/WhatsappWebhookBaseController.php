@@ -17,6 +17,21 @@ class WhatsappWebhookBaseController
         $this->api_key = config('whatsapp.apps.'.$this->app_name.'.api_key');
     }
 
+    public function __invoke(Request $request)
+    {
+        switch ($request->method()) {
+            case 'GET':
+                return self::handleWebhookVerficationRequest($request);
+                break;
+            case 'POST':
+                return self::handlePayload($request);
+                break;
+            default:
+                abort(415);
+                break;
+        }
+    }
+
     public function handleWebhookVerficationRequest(Request $request): string
     {
         $hub_mode = $request->input('hub_mode', null);
