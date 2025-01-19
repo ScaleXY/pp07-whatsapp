@@ -3,26 +3,18 @@
 namespace ScaleXY\Whatsapp\Controllers;
 
 use Illuminate\Http\Request;
+use ScaleXY\Whatsapp\Events\TextMessageReceived;
 
-class WhatsappWebhookController
+class WhatsappWebhookBaseController
 {
-    protected $app_name;
-
     protected $webhook_secret;
 
     protected $api_key;
 
-    protected $callback_static_class;
-
-    protected $callback_static_function;
-
-    public function __construct($config = [])
+    public function __construct()
     {
-        $this->app_name = $config['app_name'] ?? config('whatsapp.apps.'.config('whatsapp.default_app').'.app_name');
-        $this->webhook_secret = $config['webhook_secret'] ?? config('whatsapp.apps.'.$this->app_name.'.webhook_secret');
-        $this->api_key = $config['api_key'] ?? config('whatsapp.apps.'.$this->app_name.'.api_key');
-        $this->callback_static_class = $config['callback_static_class'] ?? null;
-        $this->callback_static_function = $config['callback_static_function'] ?? null;
+        $this->webhook_secret = config('whatsapp.apps.'.$this->app_name.'.webhook_secret');
+        $this->api_key = config('whatsapp.apps.'.$this->app_name.'.api_key');
     }
 
     public function handleWebhookVerficationRequest(Request $request): string
@@ -55,8 +47,7 @@ class WhatsappWebhookController
             foreach ($item['changes'] as $change) {
                 foreach ($change['value']['contacts'] as $contact) {
                     foreach ($change['value']['messages'] as $message) {
-                        // self::handleMessage($contact['wa_id'], $message['text']['body']);
-                        $this->callback_static_class::{$this->callback_static_function}($contact['wa_id'], $message['text']['body']);
+                        TextMessageReceived::dispatch($contact['wa_id'].' said '.$message['text']['body']);
                     }
                 }
             }
