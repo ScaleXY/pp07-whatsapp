@@ -11,13 +11,16 @@ class TextMessageReceived
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $sender;
+
     public $message;
 
     /**
      * Create a new event instance.
      */
-    public function __construct($message)
+    public function __construct($sender, $message)
     {
+        $this->sender = $sender;
         $this->message = $message;
     }
 
