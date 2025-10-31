@@ -35,40 +35,40 @@ class Whatsapp
             ],
         ]);
     }
-	
+
     public function sendAuthMessage($number, $code)
     {
         return $this->client->post('https://graph.facebook.com/v22.0/'.$this->number_id.'/messages', [
             'messaging_product' => 'whatsapp',
-  			"type" => "template",
+            'type' => 'template',
             'to' => $number,
             'template' => [
-                'name' => "login_code_02",
-				"language" => [
-					"code" => "en"
-				],
-				"components" => [
-					[
-						"type" => "body",
-						"parameters" => [
-							[
-								"type" => "text",
-								"text" => $code
-							]
-						]
-					],
-					[
-						"type" => "button",
-						"sub_type" => "url",
-						"index" => "0",
-						"parameters" => [
-							[
-								"type" => "text",
-								"text" => $code
-							]
-						]
-					]
-				]
+                'name' => 'login_code_02',
+                'language' => [
+                    'code' => 'en',
+                ],
+                'components' => [
+                    [
+                        'type' => 'body',
+                        'parameters' => [
+                            [
+                                'type' => 'text',
+                                'text' => $code,
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => 'button',
+                        'sub_type' => 'url',
+                        'index' => '0',
+                        'parameters' => [
+                            [
+                                'type' => 'text',
+                                'text' => $code,
+                            ],
+                        ],
+                    ],
+                ],
             ],
         ]);
     }
