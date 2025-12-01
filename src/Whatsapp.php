@@ -38,38 +38,39 @@ class Whatsapp
 
     public function sendAuthMessage($number, $code, $template_id = null)
     {
-		$template_id = $template_id ?? config('whatsapp.default_templates.auth_message');
+        $template_id = $template_id ?? config('whatsapp.default_templates.auth_message');
+
         return $this->client->post('https://graph.facebook.com/v22.0/'.$this->number_id.'/messages', [
             'messaging_product' => 'whatsapp',
-  			"type" => "template",
+            'type' => 'template',
             'to' => $number,
             'template' => [
                 'name' => $template_id,
-				"language" => [
-					"code" => "en"
-				],
-				"components" => [
-					[
-						"type" => "body",
-						"parameters" => [
-							[
-								"type" => "text",
-								"text" => $code
-							]
-						]
-					],
-					[
-						"type" => "button",
-						"sub_type" => "url",
-						"index" => "0",
-						"parameters" => [
-							[
-								"type" => "text",
-								"text" => $code
-							]
-						]
-					]
-				]
+                'language' => [
+                    'code' => 'en',
+                ],
+                'components' => [
+                    [
+                        'type' => 'body',
+                        'parameters' => [
+                            [
+                                'type' => 'text',
+                                'text' => $code,
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => 'button',
+                        'sub_type' => 'url',
+                        'index' => '0',
+                        'parameters' => [
+                            [
+                                'type' => 'text',
+                                'text' => $code,
+                            ],
+                        ],
+                    ],
+                ],
             ],
         ]);
     }
