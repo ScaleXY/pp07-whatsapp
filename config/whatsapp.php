@@ -9,4 +9,7 @@ return [
             'number_id' => env('WHATSAPP_COMMON_APP_NUMBER_ID', ''),
         ],
     ],
+	'default_templates' => [
+		"auth_message" => "login_code_01"
+	]
 ];
