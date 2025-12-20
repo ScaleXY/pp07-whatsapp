@@ -3,6 +3,8 @@
 namespace ScaleXY\Whatsapp\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use ScaleXY\Whatsapp\Events\MessageStatusUpdate;
 use ScaleXY\Whatsapp\Events\TextMessageReceived;
 
 class WhatsappWebhookBaseController
@@ -59,12 +61,27 @@ class WhatsappWebhookBaseController
     public function handleWhatsappBusinessAccount($entry)
     {
         foreach ($entry as $item) {
+            // $item['id'];
             foreach ($item['changes'] as $change) {
-                foreach ($change['value']['contacts'] as $contact) {
-                    foreach ($change['value']['messages'] as $message) {
-                        TextMessageReceived::dispatch($contact['wa_id'], $message['text']['body'], $change);
+                // Look for inbound messages
+                if (isset($change['value']['messages'])) {
+                    foreach ($change['value']['contacts'] as $contact) {
+                        foreach ($change['value']['messages'] as $message) {
+                            TextMessageReceived::dispatch($contact['wa_id'], $message['text']['body'], $change);
+                            Log::warning($contact['wa_id'].' said '.$message['text']['body']);
+                        }
                     }
                 }
+                if (isset($change['value']['statuses'])) {
+                    foreach ($change['value']['statuses'] as $status) {
+                        MessageStatusUpdate::dispatch($status['id'], $status['status'], $change);
+                        Log::warning($status['id'].' is '.$status['status']);
+                    }
+                }
+                // Look for message_template_status_update → template approval/rejection
+                // Look for errors → delivery or platform errors
+                // Look for contacts → user profile info
+                // Look for metadata → phone number ID, display number
             }
         }
     }
