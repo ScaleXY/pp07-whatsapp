@@ -33,13 +33,14 @@ class Whatsapp
                 'preview_url' => false,
                 'body' => $message,
             ],
-        ]);
+        ])->json();
     }
 
     public function sendAuthMessage($number, $code, $template_id = null)
     {
         $template_id = $template_id ?? config('whatsapp.default_templates.auth_message');
-        $this->sendRawMessage($number, [
+
+        return $this->sendRawMessage($number, [
             'name' => $template_id,
             'language' => [
                 'code' => 'en',
@@ -69,14 +70,30 @@ class Whatsapp
         ]);
     }
 
+    public function sendTemplateMessage($number, $template_message)
+    {
+        $template_id = $template_message->getTemplateId();
+        $components = $template_message->getComponentsJSON();
+
+        return $this->sendRawMessage($number, [
+            'name' => $template_id,
+            'language' => [
+                'code' => 'en',
+            ],
+            'components' => $components,
+        ]);
+    }
+
     public function sendRawMessage($number, $templateData)
     {
-        return $this->client->post('https://graph.facebook.com/v22.0/'.$this->number_id.'/messages', [
+
+        return $this->client->post('https://graph.facebook.com/v22.0/'.$this->number_id.'/marketing_messages', [
+            // return $this->client->post('https://graph.facebook.com/v22.0/'.$this->number_id.'/messages', [
             'messaging_product' => 'whatsapp',
             'recipient_type' => 'individual',
             'to' => $number,
             'type' => 'template',
             'template' => $templateData,
-        ]);
+        ])->json();
     }
 }
