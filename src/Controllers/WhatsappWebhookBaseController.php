@@ -65,16 +65,16 @@ class WhatsappWebhookBaseController
             foreach ($item['changes'] as $change) {
                 // Look for inbound messages
                 if (isset($change['value']['messages'])) {
-                    foreach ($change['value']['contacts'] as $contact) {
-                        foreach ($change['value']['messages'] as $message) {
-                            TextMessageReceived::dispatch($contact['wa_id'], $message['text']['body'], $change);
+                    foreach ($change['value']['messages'] as $message) {
+                        foreach ($change['value']['contacts'] as $contact) {
+                            TextMessageReceived::dispatch($contact['wa_id'], $message['text']['body'], $message);
                             Log::warning($contact['wa_id'].' said '.$message['text']['body']);
                         }
                     }
                 }
                 if (isset($change['value']['statuses'])) {
                     foreach ($change['value']['statuses'] as $status) {
-                        MessageStatusUpdate::dispatch($status['id'], $status['status'], $change);
+                        MessageStatusUpdate::dispatch($status['id'], $status['status'], $status);
                         Log::warning($status['id'].' is '.$status['status']);
                     }
                 }

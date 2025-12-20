@@ -11,21 +11,14 @@ class TextMessageReceived
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $sender;
-
-    public $message;
-
-    public $full_change;
-
     /**
      * Create a new event instance.
      */
-    public function __construct($sender, $message, $full_change)
-    {
-        $this->sender = $sender;
-        $this->message = $message;
-        $this->full_change = $full_change;
-    }
+    public function __construct(
+        public string $sender,
+        public string $message,
+        public $message_data,
+    ) {}
 
     /**
      * Get the channels the event should broadcast on.

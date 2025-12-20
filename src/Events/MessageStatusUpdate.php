@@ -17,7 +17,7 @@ class MessageStatusUpdate
     public function __construct(
         public string $message_id,
         public string $status,
-        public $full_change = null,
+        public $status_data = null,
     ) {}
 
     /**
