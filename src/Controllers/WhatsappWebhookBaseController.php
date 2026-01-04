@@ -67,7 +67,12 @@ class WhatsappWebhookBaseController
                 if (isset($change['value']['messages'])) {
                     foreach ($change['value']['messages'] as $message) {
                         foreach ($change['value']['contacts'] as $contact) {
-                            TextMessageReceived::dispatch($contact['wa_id'], $message['text']['body'], $message);
+                            TextMessageReceived::dispatch(
+                                $contact['wa_id'],
+                                $message['text']['body'],
+                                $change['value']['metadata']['phone_number_id'],
+                                $message
+                            );
                             Log::warning($contact['wa_id'].' said '.$message['text']['body']);
                         }
                     }

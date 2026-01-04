@@ -17,6 +17,7 @@ class TextMessageReceived
     public function __construct(
         public string $sender,
         public string $message,
+        public string $phone_number_id,
         public $message_data,
     ) {}
 
