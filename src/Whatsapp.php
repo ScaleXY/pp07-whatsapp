@@ -37,6 +37,22 @@ class Whatsapp
         ]);
     }
 
+    public function sendDocument($link, $caption = null, $filename = null)
+    {
+        $document = ['link' => $link];
+        if ($caption) {
+            $document['caption'] = $caption;
+        }
+        if ($filename) {
+            $document['filename'] = $filename;
+        }
+
+        return $this->sendRawMessage([
+            'type' => 'document',
+            'document' => $document,
+        ]);
+    }
+
     public function sendAuthMessage($code, $template_id = null)
     {
         $template_id = $template_id ?? config('whatsapp.default_templates.auth_message');
