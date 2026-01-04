@@ -14,6 +14,10 @@ class Whatsapp
 
     protected $client;
 
+    protected $recipient_type;
+
+    protected $to;
+
     public function __construct($config = [])
     {
         $this->app_name = $config['app_name'] ?? config('whatsapp.default_app_name');
@@ -23,46 +27,46 @@ class Whatsapp
         $this->client = Http::withToken($this->api_key);
     }
 
-    public function sendFreeText($number, $message)
+    public function sendFreeText($message)
     {
-        return $this->client->post('https://graph.facebook.com/v22.0/'.$this->number_id.'/messages', [
-            'messaging_product' => 'whatsapp',
-            'recipient_type' => 'individual',
-            'to' => $number,
+        return $this->sendRawMessage([
+            'type' => 'text',
             'text' => [
-                'preview_url' => false,
                 'body' => $message,
             ],
-        ])->json();
+        ]);
     }
 
-    public function sendAuthMessage($number, $code, $template_id = null)
+    public function sendAuthMessage($code, $template_id = null)
     {
         $template_id = $template_id ?? config('whatsapp.default_templates.auth_message');
 
-        return $this->sendRawMessage($number, [
-            'name' => $template_id,
-            'language' => [
-                'code' => 'en',
-            ],
-            'components' => [
-                [
-                    'type' => 'body',
-                    'parameters' => [
-                        [
-                            'type' => 'text',
-                            'text' => $code,
+        return $this->sendRawMessage([
+            'type' => 'template',
+            'template' => [
+                'name' => $template_id,
+                'language' => [
+                    'code' => 'en',
+                ],
+                'components' => [
+                    [
+                        'type' => 'body',
+                        'parameters' => [
+                            [
+                                'type' => 'text',
+                                'text' => $code,
+                            ],
                         ],
                     ],
-                ],
-                [
-                    'type' => 'button',
-                    'sub_type' => 'url',
-                    'index' => '0',
-                    'parameters' => [
-                        [
-                            'type' => 'text',
-                            'text' => $code,
+                    [
+                        'type' => 'button',
+                        'sub_type' => 'url',
+                        'index' => '0',
+                        'parameters' => [
+                            [
+                                'type' => 'text',
+                                'text' => $code,
+                            ],
                         ],
                     ],
                 ],
@@ -70,30 +74,45 @@ class Whatsapp
         ]);
     }
 
-    public function sendTemplateMessage($number, $template_message)
+    public function sendTemplateMessage($template_message)
     {
         $template_id = $template_message->getTemplateId();
         $components = $template_message->getComponentsJSON();
 
-        return $this->sendRawMessage($number, [
-            'name' => $template_id,
-            'language' => [
-                'code' => 'en',
+        return $this->sendRawMessage([
+            'type' => 'template',
+            'template' => [
+                'name' => $template_id,
+                'language' => [
+                    'code' => 'en',
+                ],
+                'components' => $components,
             ],
-            'components' => $components,
         ]);
     }
 
-    public function sendRawMessage($number, $templateData)
+    public function setIndividualAsRecipient($number)
     {
+        $this->recipient_type = 'individual';
+        $this->to = $number;
 
-        return $this->client->post('https://graph.facebook.com/v22.0/'.$this->number_id.'/marketing_messages', [
-            // return $this->client->post('https://graph.facebook.com/v22.0/'.$this->number_id.'/messages', [
-            'messaging_product' => 'whatsapp',
-            'recipient_type' => 'individual',
-            'to' => $number,
-            'type' => 'template',
-            'template' => $templateData,
-        ])->json();
+        return $this;
+    }
+
+    public function sendRawMessage($data)
+    {
+        $data['messaging_product'] = 'whatsapp';
+        if ($this->recipient_type) {
+            $data['recipient_type'] = $this->recipient_type;
+        } else {
+            throw new \InvalidArgumentException('Recipient type not set. Call setIndividualAsRecipient() first.');
+        }
+        if ($this->to) {
+            $data['to'] = $this->to;
+        } else {
+            throw new \InvalidArgumentException('Recipient number not set. Call setIndividualAsRecipient() first.');
+        }
+
+        return $this->client->post('https://graph.facebook.com/v22.0/'.$this->number_id.'/messages', $data)->json();
     }
 }
