@@ -120,6 +120,12 @@ class Whatsapp
         return $this;
     }
 
+	public function setFooter(string $footer_text)
+	{
+		$this->footer = $footer_text;
+		return $this;
+	}
+
     public function sendRawMessage($data)
     {
         $data['messaging_product'] = 'whatsapp';
@@ -137,6 +143,9 @@ class Whatsapp
             $data['to'] = $this->to;
         } else {
             throw new \InvalidArgumentException('Recipient number not set. Call setIndividualAsRecipient() first.');
+        }
+        if ($this->footer) {
+            $data[$this->type]['footer'] = ['text' => $this->footer];
         }
 
         return $this->client->post('https://graph.facebook.com/v22.0/'.$this->number_id.'/messages', $data)->json();
