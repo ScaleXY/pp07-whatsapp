@@ -10,6 +10,8 @@ class Whatsapp
 
     protected $number_id;
 
+    protected $type;
+
     protected $api_key;
 
     protected $client;
@@ -17,6 +19,8 @@ class Whatsapp
     protected $recipient_type;
 
     protected $to;
+
+    protected $footer;
 
     public function __construct($config = [])
     {
@@ -29,8 +33,8 @@ class Whatsapp
 
     public function sendFreeText($message)
     {
+		$this->type = 'text';
         return $this->sendRawMessage([
-            'type' => 'text',
             'text' => [
                 'body' => $message,
             ],
@@ -39,6 +43,7 @@ class Whatsapp
 
     public function sendDocument($link, $caption = null, $filename = null)
     {
+		$this->type = 'document';
         $document = ['link' => $link];
         if ($caption) {
             $document['caption'] = $caption;
@@ -48,17 +53,16 @@ class Whatsapp
         }
 
         return $this->sendRawMessage([
-            'type' => 'document',
             'document' => $document,
         ]);
     }
 
     public function sendAuthMessage($code, $template_id = null)
     {
+        $this->type = 'template';
         $template_id = $template_id ?? config('whatsapp.default_templates.auth_message');
 
         return $this->sendRawMessage([
-            'type' => 'template',
             'template' => [
                 'name' => $template_id,
                 'language' => [
@@ -94,9 +98,9 @@ class Whatsapp
     {
         $template_id = $template_message->getTemplateId();
         $components = $template_message->getComponentsJSON();
+		$this->type = 'template';
 
         return $this->sendRawMessage([
-            'type' => 'template',
             'template' => [
                 'name' => $template_id,
                 'language' => [
@@ -118,6 +122,11 @@ class Whatsapp
     public function sendRawMessage($data)
     {
         $data['messaging_product'] = 'whatsapp';
+        if ($this->type) {
+            $data['type'] = $this->type;
+        } else {
+            throw new \InvalidArgumentException('Message type not set. Call appropriate send method first.');
+        }
         if ($this->recipient_type) {
             $data['recipient_type'] = $this->recipient_type;
         } else {
