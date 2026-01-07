@@ -33,7 +33,8 @@ class Whatsapp
 
     public function sendFreeText($message)
     {
-		$this->type = 'text';
+        $this->type = 'text';
+
         return $this->sendRawMessage([
             'text' => [
                 'body' => $message,
@@ -43,7 +44,7 @@ class Whatsapp
 
     public function sendDocument($link, $caption = null, $filename = null)
     {
-		$this->type = 'document';
+        $this->type = 'document';
         $document = ['link' => $link];
         if ($caption) {
             $document['caption'] = $caption;
@@ -98,7 +99,7 @@ class Whatsapp
     {
         $template_id = $template_message->getTemplateId();
         $components = $template_message->getComponentsJSON();
-		$this->type = 'template';
+        $this->type = 'template';
 
         return $this->sendRawMessage([
             'template' => [
