@@ -7,16 +7,18 @@ use Illuminate\Support\Facades\Log;
 use ScaleXY\Whatsapp\Events\MessageStatusUpdate;
 use ScaleXY\Whatsapp\Events\TextMessageReceived;
 
-class WhatsappWebhookBaseController
+abstract class WhatsappWebhookBaseController
 {
     protected $webhook_secret;
 
     protected $api_key;
 
+    abstract protected static function getAppName(): string;
+
     public function __construct()
     {
-        $this->webhook_secret = config('whatsapp.apps.'.$this->app_name.'.webhook_secret');
-        $this->api_key = config('whatsapp.apps.'.$this->app_name.'.api_key');
+        $this->webhook_secret = config('whatsapp.apps.'.$this->getAppName().'.webhook_secret');
+        $this->api_key = config('whatsapp.apps.'.$this->getAppName().'.api_key');
     }
 
     public function __invoke(Request $request)

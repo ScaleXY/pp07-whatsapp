@@ -145,9 +145,6 @@ class Whatsapp
         } else {
             throw new \InvalidArgumentException('Recipient number not set. Call setIndividualAsRecipient() first.');
         }
-        if ($this->footer) {
-            $data[$this->type]['footer'] = ['text' => $this->footer];
-        }
 
         return $this->client->post('https://graph.facebook.com/v22.0/'.$this->number_id.'/messages', $data)->json();
     }
