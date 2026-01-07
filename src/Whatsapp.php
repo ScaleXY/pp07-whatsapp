@@ -120,11 +120,12 @@ class Whatsapp
         return $this;
     }
 
-	public function setFooter(string $footer_text)
-	{
-		$this->footer = $footer_text;
-		return $this;
-	}
+    public function setFooter(string $footer_text)
+    {
+        $this->footer = $footer_text;
+
+        return $this;
+    }
 
     public function sendRawMessage($data)
     {
